@@ -1,0 +1,119 @@
+{
+  "values": {
+    "create:shaft": {
+      "lifetime": 300,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:cogwheel": {
+      "lifetime": 150,
+      "rated_speed": 128,
+      "failure": "teeth"
+    },
+    "create:large_cogwheel": {
+      "lifetime": 180,
+      "rated_speed": 96,
+      "failure": "teeth"
+    },
+    "create:andesite_encased_shaft": {
+      "lifetime": 360,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:brass_encased_shaft": {
+      "lifetime": 420,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:metal_girder_encased_shaft": {
+      "lifetime": 300,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:andesite_encased_cogwheel": {
+      "lifetime": 220,
+      "rated_speed": 128,
+      "failure": "teeth"
+    },
+    "create:brass_encased_cogwheel": {
+      "lifetime": 260,
+      "rated_speed": 128,
+      "failure": "teeth"
+    },
+    "create:andesite_encased_large_cogwheel": {
+      "lifetime": 240,
+      "rated_speed": 96,
+      "failure": "teeth"
+    },
+    "create:brass_encased_large_cogwheel": {
+      "lifetime": 280,
+      "rated_speed": 96,
+      "failure": "teeth"
+    },
+    "create:gearbox": {
+      "lifetime": 240,
+      "rated_speed": 160,
+      "failure": "seize"
+    },
+    "create:clutch": {
+      "lifetime": 240,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:gearshift": {
+      "lifetime": 240,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:encased_chain_drive": {
+      "lifetime": 200,
+      "rated_speed": 160,
+      "failure": "teeth"
+    },
+    "create:adjustable_chain_gearshift": {
+      "lifetime": 200,
+      "rated_speed": 160,
+      "failure": "teeth"
+    },
+    "create:crushing_wheel": {
+      "lifetime": 200,
+      "rated_speed": 128,
+      "failure": "smooth"
+    },
+    "create:millstone": {
+      "lifetime": 240,
+      "rated_speed": 128,
+      "failure": "seize"
+    },
+    "create:mechanical_press": {
+      "lifetime": 240,
+      "rated_speed": 128,
+      "failure": "seize"
+    },
+    "create:mechanical_mixer": {
+      "lifetime": 240,
+      "rated_speed": 128,
+      "failure": "seize"
+    },
+    "create:mechanical_saw": {
+      "lifetime": 200,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:mechanical_drill": {
+      "lifetime": 200,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:encased_fan": {
+      "lifetime": 300,
+      "rated_speed": 192,
+      "failure": "seize"
+    },
+    "create:mechanical_pump": {
+      "lifetime": 300,
+      "rated_speed": 192,
+      "failure": "seize"
+    }
+  }
+}

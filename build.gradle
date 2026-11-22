@@ -1,0 +1,122 @@
+plugins {
+    id "java-library"
+    id "idea"
+    id "net.neoforged.moddev" version "2.0.141"
+}
+
+version = mod_version
+group = mod_group_id
+base.archivesName = "${mod_id}-${minecraft_version}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// GameTests live in their own source set so they never end up in the release jar.
+sourceSets {
+    gametest {
+        compileClasspath += main.output + main.compileClasspath
+        runtimeClasspath += main.output + main.runtimeClasspath
+    }
+}
+configurations {
+    gametestImplementation.extendsFrom implementation
+}
+
+neoForge {
+    version = neo_version
+
+    parchment {
+        minecraftVersion = parchment_minecraft_version
+        mappingsVersion = parchment_version
+    }
+
+    runs {
+        configureEach {
+            systemProperty "forge.logging.markers", "REGISTRIES"
+            logLevel = org.slf4j.event.Level.INFO
+        }
+        client {
+            client()
+            systemProperty "neoforge.enabledGameTestNamespaces", mod_id
+        }
+        server {
+            server()
+            gameDirectory = project.file("run/server")
+            programArgument "--nogui"
+            systemProperty "neoforge.enabledGameTestNamespaces", mod_id
+        }
+        // dev-only: builds a showcase world and screenshots it (see DevSceneClient)
+        sceneClient {
+            client()
+            sourceSet = sourceSets.gametest
+            gameDirectory = project.file("run/scene")
+            systemProperty "createwear.devScene", "true"
+            systemProperty "createwear.devScene.debug", (project.findProperty("sceneDebug") ?: "false").toString()
+            systemProperty "createwear.devScene.breakTest", (project.findProperty("sceneBreakTest") ?: "false").toString()
+            programArguments.addAll("--width", "1280", "--height", "720")
+        }
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty "neoforge.enabledGameTestNamespaces", mod_id
+            sourceSet = sourceSets.gametest
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gametest)
+        }
+    }
+}
+
+repositories {
+    maven { url = "https://maven.createmod.net" }          // Create, Ponder, Flywheel
+    maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate
+    maven { url = "https://maven.blamejared.com" }         // JEI
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven" } // config api port (Ponder)
+}
+
+dependencies {
+    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    implementation("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
+    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    implementation("com.tterrag.registrate:Registrate:${registrate_version}")
+
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            create_version_range   : create_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
+
+// dev-only: run the worn asset generator outside the game
+tasks.register("previewAssets", JavaExec) {
+    classpath = sourceSets.gametest.runtimeClasspath
+    mainClass = "dev.createwear.gametest.AssetPreview"
+    args = [file("build/asset-preview").absolutePath]
+    systemProperty "java.awt.headless", "true"
+}

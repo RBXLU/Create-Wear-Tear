@@ -1,0 +1,24 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "type": "neoforge:components",
+      "items": "create:cogwheel",
+      "components": {},
+      "strict": true
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "create_wear:hardening_compound"
+    }
+  ],
+  "results": [
+    {
+      "id": "create:cogwheel",
+      "components": {
+        "create_wear:reinforced": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "tooth.snap": {
+    "subtitle": "create_wear.subtitle.tooth.snap",
+    "sounds": [
+      "create_wear:tooth_snap_1",
+      "create_wear:tooth_snap_2",
+      "create_wear:tooth_snap_3"
+    ]
+  },
+  "tooth.land": {
+    "subtitle": "create_wear.subtitle.tooth.land",
+    "sounds": [
+      "create_wear:tooth_land_1",
+      "create_wear:tooth_land_2",
+      "create_wear:tooth_land_3"
+    ]
+  },
+  "part.break_wood": {
+    "subtitle": "create_wear.subtitle.part.break_wood",
+    "sounds": [
+      "create_wear:break_wood_1",
+      "create_wear:break_wood_2"
+    ]
+  },
+  "part.break_metal": {
+    "subtitle": "create_wear.subtitle.part.break_metal",
+    "sounds": [
+      "create_wear:break_metal_1",
+      "create_wear:break_metal_2"
+    ]
+  },
+  "part.break_stone": {
+    "subtitle": "create_wear.subtitle.part.break_stone",
+    "sounds": [
+      "create_wear:break_stone_1",
+      "create_wear:break_stone_2"
+    ]
+  },
+  "part.jolt": {
+    "subtitle": "create_wear.subtitle.part.jolt",
+    "sounds": [
+      "create_wear:jolt_1",
+      "create_wear:jolt_2",
+      "create_wear:jolt_3"
+    ]
+  },
+  "part.grind": {
+    "subtitle": "create_wear.subtitle.part.grind",
+    "sounds": [
+      "create_wear:grind_1",
+      "create_wear:grind_2",
+      "create_wear:grind_3"
+    ]
+  },
+  "part.coat": {
+    "subtitle": "create_wear.subtitle.part.coat",
+    "sounds": [
+      "create_wear:coat_1",
+      "create_wear:coat_2"
+    ]
+  }
+}

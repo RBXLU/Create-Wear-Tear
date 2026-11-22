@@ -1,0 +1,27 @@
+{
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "item": "create_wear:mechanical_scrap"
+    }
+  ],
+  "processing_time": 150,
+  "results": [
+    {
+      "id": "minecraft:iron_nugget",
+      "count": 2
+    },
+    {
+      "id": "minecraft:iron_nugget",
+      "chance": 0.5
+    },
+    {
+      "id": "create:andesite_alloy",
+      "chance": 0.25
+    },
+    {
+      "id": "minecraft:stick",
+      "chance": 0.5
+    }
+  ]
+}

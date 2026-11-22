@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "create_wear:fluid/hardening_compound_still"
+    },
+    {
+      "type": "single",
+      "resource": "create_wear:fluid/hardening_compound_flow"
+    }
+  ]
+}

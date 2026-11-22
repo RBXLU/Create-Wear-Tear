@@ -1,0 +1,24 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "type": "neoforge:components",
+      "items": "create:mechanical_mixer",
+      "components": {},
+      "strict": true
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "create_wear:hardening_compound"
+    }
+  ],
+  "results": [
+    {
+      "id": "create:mechanical_mixer",
+      "components": {
+        "create_wear:reinforced": true
+      }
+    }
+  ]
+}
