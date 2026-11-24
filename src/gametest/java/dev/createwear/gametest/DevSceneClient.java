@@ -78,6 +78,9 @@ public final class DevSceneClient {
     private static final int FIRST_SHOT = DEBUG ? 0 : 420;
     private static final int SHOT_SPACING = DEBUG ? 80 : 200;
 
+    private static final boolean ICON = Boolean.getBoolean("createwear.devScene.icon");
+    private static final net.minecraft.core.BlockPos ICON_COG = new net.minecraft.core.BlockPos(40, -54, -20);
+
     private static boolean worldRequested;
     private static int ticks;
 
@@ -93,6 +96,10 @@ public final class DevSceneClient {
         }
 
         ticks++;
+        if (ICON) {
+            iconTick(mc);
+            return;
+        }
         if (ticks == BUILD_AT)
             onServer(mc, (level, player) -> {
                 DevScene.build(level);
@@ -137,6 +144,59 @@ public final class DevSceneClient {
             Screenshot.grab(mc.gameDirectory, "createwear_" + shot.name + ".png", mc.getMainRenderTarget(),
                 msg -> CreateWear.LOGGER.info("[DevScene] {}", msg.getString()));
         }
+    }
+
+    /** A close-up of one large cogwheel in front of a green screen, shedding its teeth. */
+    private static void iconTick(Minecraft mc) {
+        net.minecraft.core.BlockPos c = ICON_COG;
+        Shot camera = new Shot("icon", c.getX() + .5, c.getY() + .5, c.getZ() + .5 + 1.95, 180, 0, false, m -> {});
+        if (ticks >= 30)
+            hold(mc, camera);
+        mc.options.hideGui = true;
+        switch (ticks) {
+            case 40 -> onServer(mc, (level, player) -> {
+                level.setDayTime(6000);
+                level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, level.getServer());
+                player.setGameMode(GameType.CREATIVE);
+                var air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+                var screen = net.minecraft.world.level.block.Blocks.LIME_CONCRETE.defaultBlockState();
+                for (int x = -7; x <= 7; x++)
+                    for (int y = -7; y <= 7; y++) {
+                        for (int z = -2; z <= 4; z++)
+                            level.setBlock(c.offset(x, y, z), air, 2);
+                        level.setBlock(c.offset(x, y, -3), screen, 2);
+                    }
+                level.setBlock(c.north(2), AllBlocks.CREATIVE_MOTOR.getDefaultState()
+                    .setValue(com.simibubi.create.content.kinetics.motor.CreativeMotorBlock.FACING, net.minecraft.core.Direction.SOUTH), 3);
+                if (level.getBlockEntity(c.north(2)) instanceof com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity motor)
+                    motor.generatedSpeed.setValue(6);
+                level.setBlock(c.north(), AllBlocks.SHAFT.getDefaultState()
+                    .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.Z), 3);
+                level.setBlock(c, AllBlocks.LARGE_COGWHEEL.getDefaultState()
+                    .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.Z), 3);
+            });
+            case 70 -> onServer(mc, (level, player) -> {
+                var wear = dev.createwear.wear.WearBehaviour.get(level.getBlockEntity(c));
+                if (wear != null) {
+                    wear.setWear(.55f);
+                    wear.reinforce();
+                }
+            });
+            case 140, 300 -> setWear(mc, c, .7f);
+            case 220 -> setWear(mc, c, .55f);
+            case 380 -> setWear(mc, c, .55f);
+            case 440 -> setWear(mc, c, 1f);
+            case 520 -> {
+                CreateWear.LOGGER.info("[DevScene] icon shots taken");
+                mc.stop();
+            }
+            default -> {}
+        }
+        int[] captures = { 130, 144, 146, 148, 151, 304, 306, 309, 444, 446, 448, 451 };
+        for (int at : captures)
+            if (ticks == at)
+                Screenshot.grab(mc.gameDirectory, "icon_" + at + ".png", mc.getMainRenderTarget(),
+                    msg -> CreateWear.LOGGER.info("[DevScene] {}", msg.getString()));
     }
 
     private static void hold(Minecraft mc, Shot shot) {
