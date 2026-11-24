@@ -1,16 +1,3 @@
-<!--
-Modrinth project fields
-
-Name:     Create: Wear & Tear
-Summary:  Gears wear out, teeth snap off and misused machines break. Keep your Create factory running with maintenance and a hardening compound brewed in a basin.
-Category: Technology (+ Game Mechanics)
-Loader:   NeoForge   Game version: 1.21.1   Environment: client and server
-Depends:  Create 6.0.10+ (required)
-License:  MIT
-Icon:     docs/icon.png
-Gallery:  docs/screenshots/*.png
--->
-
 # Create: Wear & Tear
 
 **Your machines are no longer immortal.** Cogwheels, shafts, gearboxes and machines slowly wear out while they turn. Run them too fast, overload the network or slam them into reverse and they break even sooner. Watch for the scratches and cracks, replace parts before they fail, and harden the important ones with a compound brewed in your own basin.
