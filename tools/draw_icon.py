@@ -2,16 +2,17 @@
 """
 Draws the project icon in the style of Create's own icon: a flat-shaded blocky illustration with a
 white sticker outline, breaking out of a blue blueprint disc. Everything is original art, rendered
-by the tiny z-buffered rasteriser below.
+by the tiny z-buffered rasteriser below. Writes the project icon and the mod list logo inside the jar.
 
-    python3 tools/draw_icon.py docs/icon.png
+    python3 tools/draw_icon.py
 """
 import math
-import sys
+from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw
 
+ROOT = Path(__file__).resolve().parent.parent
 SIZE, SS = 512, 4
 W = SIZE * SS
 
@@ -203,7 +204,6 @@ def disc():
 
 
 def main():
-    out = sys.argv[1] if len(sys.argv) > 1 else "docs/icon.png"
     cam = Camera(rot(-24, 22, -14), 19.5 * SS, (W * .45, W * .56))
     raster = cam.render(gear() + fragments())
     decorate(raster, cam)
@@ -222,8 +222,10 @@ def main():
         rgb = (layer_rgb * a + rgb * alpha[..., None] * (1 - a)) / np.maximum(out_a, 1e-6)[..., None]
         alpha = out_a
 
-    Image.fromarray(np.dstack([rgb, alpha * 255]).clip(0, 255).astype(np.uint8), "RGBA").save(out, optimize=True)
-    print("icon written to", out)
+    icon = Image.fromarray(np.dstack([rgb, alpha * 255]).clip(0, 255).astype(np.uint8), "RGBA")
+    icon.save(ROOT / "docs/icon.png", optimize=True)
+    icon.resize((256, 256), Image.LANCZOS).save(ROOT / "src/main/resources/logo.png", optimize=True)
+    print("icon and logo written")
 
 
 if __name__ == "__main__":
