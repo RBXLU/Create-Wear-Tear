@@ -1,4 +1,12 @@
 {
+  "part.creak": {
+    "subtitle": "create_wear.subtitle.part.creak",
+    "sounds": [
+      "create_wear:creak_1",
+      "create_wear:creak_2",
+      "create_wear:creak_3"
+    ]
+  },
   "tooth.snap": {
     "subtitle": "create_wear.subtitle.tooth.snap",
     "sounds": [

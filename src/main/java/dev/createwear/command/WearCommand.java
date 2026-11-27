@@ -31,6 +31,9 @@ public final class WearCommand {
                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
                     .then(Commands.argument("percent", FloatArgumentType.floatArg(0, 100))
                         .executes(ctx -> set(ctx, FloatArgumentType.getFloat(ctx, "percent") / 100f)))))
+            .then(Commands.literal("fail")
+                .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                    .executes(WearCommand::fail)))
             .then(Commands.literal("repair")
                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
                     .executes(ctx -> set(ctx, 0))))
@@ -62,6 +65,13 @@ public final class WearCommand {
         WearBehaviour wear = target(ctx);
         wear.setWear(value);
         ctx.getSource().sendSuccess(() -> WearLang.translate("command.set", WearLang.percent(wear.wear())).component(), true);
+        return 1;
+    }
+
+    private static int fail(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        WearBehaviour wear = target(ctx);
+        wear.startFailure();
+        ctx.getSource().sendSuccess(() -> WearLang.translate("command.fail").component(), true);
         return 1;
     }
 

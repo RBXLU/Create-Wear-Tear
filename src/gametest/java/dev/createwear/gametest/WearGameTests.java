@@ -357,4 +357,76 @@ public final class WearGameTests {
             .thenExecute(() -> h.assertTrue(Math.abs(wear(h, cog).wear() - .55f) < 1e-4, "and keep it after the casing comes off"))
             .thenSucceed();
     }
+
+    /** A part that starts failing creaks for a few seconds, then breaks and jolts its neighbours. */
+    @GameTest(template = "empty", timeoutTicks = 400)
+    public static void suddenFailureBreaksAfterWarning(GameTestHelper h) {
+        BlockPos motor = new BlockPos(1, 1, 1), shaft = motor.east(), cog = shaft.east(), meshed = cog.above();
+        motor(h, motor, 32);
+        h.setBlock(shaft, x(AllBlocks.SHAFT.getDefaultState()));
+        h.setBlock(cog, x(AllBlocks.COGWHEEL.getDefaultState()));
+        h.setBlock(meshed, x(AllBlocks.COGWHEEL.getDefaultState()));
+        h.startSequence()
+            .thenWaitUntil(() -> h.assertTrue(speed(h, meshed) != 0, "meshed cog should spin"))
+            .thenExecute(() -> {
+                wear(h, cog).setWear(.5f);
+                wear(h, cog).startFailure();
+                h.assertTrue(wear(h, cog).isFailing(), "part should be failing");
+            })
+            .thenIdle(40)
+            .thenExecute(() -> h.assertFalse(wear(h, cog).isBroken(), "the warning gives a few seconds"))
+            .thenWaitUntil(() -> h.assertTrue(wear(h, cog).isBroken(), "the failing part breaks"))
+            .thenExecute(() -> {
+                h.assertTrue(wear(h, shaft).wear() >= .025f, "the jolt wears the shaft, got " + wear(h, shaft).wear());
+                h.assertTrue(wear(h, meshed).wear() >= .025f, "the jolt wears the meshed cog, got " + wear(h, meshed).wear());
+            })
+            .thenSucceed();
+    }
+
+    /** Stopping the network while a part creaks saves it, at the cost of some wear. */
+    @GameTest(template = "empty", timeoutTicks = 300)
+    public static void stoppingNetworkSavesFailingPart(GameTestHelper h) {
+        BlockPos motor = new BlockPos(1, 1, 1), cog = motor.east();
+        motor(h, motor, 32);
+        h.setBlock(cog, x(AllBlocks.COGWHEEL.getDefaultState()));
+        h.startSequence()
+            .thenWaitUntil(() -> h.assertTrue(speed(h, cog) != 0, "cog should spin"))
+            .thenExecute(() -> {
+                wear(h, cog).setWear(.5f);
+                wear(h, cog).startFailure();
+            })
+            .thenIdle(20)
+            .thenExecute(() -> setMotorSpeed(h, motor, 0))
+            .thenWaitUntil(() -> h.assertFalse(wear(h, cog).isFailing(), "stopping the network ends the failure"))
+            .thenIdle(160)
+            .thenExecute(() -> {
+                WearBehaviour wear = wear(h, cog);
+                h.assertFalse(wear.isBroken(), "the part is saved");
+                h.assertTrue(wear.wear() > .54f && wear.wear() < .56f, "an averted failure costs about 5%, got " + wear.wear());
+            })
+            .thenSucceed();
+    }
+
+    /** With failures made very likely, a running worn part starts failing on its own. Own batch: it changes the config. */
+    @GameTest(template = "empty", timeoutTicks = 200, batch = "sudden_roll")
+    public static void runningPartsFailOnTheirOwn(GameTestHelper h) {
+        double hours = dev.createwear.config.WearConfig.FAILURE_HOURS.get();
+        dev.createwear.config.WearConfig.FAILURE_HOURS.set(.0005);
+        BlockPos motor = new BlockPos(1, 1, 1), cog = motor.east(), idle = new BlockPos(4, 1, 4);
+        motor(h, motor, 32);
+        h.setBlock(cog, x(AllBlocks.COGWHEEL.getDefaultState()));
+        h.setBlock(idle, x(AllBlocks.COGWHEEL.getDefaultState()));
+        h.startSequence()
+            .thenWaitUntil(() -> h.assertTrue(speed(h, cog) != 0, "cog should spin"))
+            .thenExecute(() -> {
+                wear(h, cog).setWear(.5f);
+                wear(h, idle).setWear(.5f);
+            })
+            .thenWaitUntil(() -> h.assertTrue(wear(h, cog).isFailing() || wear(h, cog).isBroken(), "a running part should start failing"))
+            .thenExecute(() -> {
+                dev.createwear.config.WearConfig.FAILURE_HOURS.set(hours);
+                h.assertFalse(wear(h, idle).isFailing(), "a part that does not turn never fails");
+            })
+            .thenSucceed();
+    }
 }

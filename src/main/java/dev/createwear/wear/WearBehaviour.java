@@ -46,6 +46,8 @@ public class WearBehaviour extends BlockEntityBehaviour {
     private long lastShock = Long.MIN_VALUE / 2;
     private boolean pendingDisconnect;
 
+    private int failing;
+
     private int syncedPercent = -1;
     private int syncedCauses;
     private boolean clientTicked;
@@ -126,7 +128,16 @@ public class WearBehaviour extends BlockEntityBehaviour {
 
     /** Pristine and untreated parts carry no data at all. */
     public boolean hasData() {
-        return wear > 0 || reinforced;
+        return wear > 0 || reinforced || failing > 0;
+    }
+
+    /** Ticks left before a failing part breaks, 0 when it is fine. */
+    public int failing() {
+        return failing;
+    }
+
+    public boolean isFailing() {
+        return failing > 0;
     }
 
     // ---------------------------------------------------------------- mutation
@@ -165,6 +176,77 @@ public class WearBehaviour extends BlockEntityBehaviour {
         reinforced = value;
         kinetic.setChanged();
         sync(true);
+    }
+
+    // ---------------------------------------------------------------- sudden failure
+
+    /** Something inside gives way: the part creaks and sparks for a few seconds, then breaks. */
+    public void startFailure() {
+        Level level = getWorld();
+        if (level == null || level.isClientSide || isBroken() || failing > 0 || !isWearable())
+            return;
+        int warning = WearConfig.WARNING_SECONDS.get() * 20;
+        if (warning <= 0) {
+            breakSuddenly(level);
+            return;
+        }
+        failing = warning;
+        WearEffects.strainEffects(level, kinetic);
+        kinetic.setChanged();
+        sync(true);
+    }
+
+    private void tickFailure(Level level) {
+        if (failing <= 0)
+            return;
+        if (isBroken()) {
+            failing = 0;
+            sync(true);
+            return;
+        }
+        if (kinetic.getSpeed() == 0) {
+            // the network was stopped in time: the part survives, a little worse for it
+            failing = 0;
+            WearEffects.avertEffects(level, kinetic);
+            addWear(WearConfig.f(WearConfig.AVERTED_WEAR));
+            sync(true);
+            return;
+        }
+        if (--failing <= 0) {
+            breakSuddenly(level);
+            return;
+        }
+        if (failing % 25 == 0)
+            WearEffects.strainEffects(level, kinetic);
+    }
+
+    private void breakSuddenly(Level level) {
+        failing = 0;
+        // the jolt runs into everything this part was driving or driven by
+        java.util.List<KineticBlockEntity> neighbours = WearNetworks.connectedNeighbours(kinetic);
+        WearEffects.suddenBreakEffects(level, kinetic);
+        setWear(1f);
+        float cascade = WearConfig.f(WearConfig.CASCADE_WEAR);
+        if (cascade > 0)
+            for (KineticBlockEntity neighbour : neighbours) {
+                WearBehaviour other = get(neighbour);
+                if (other != null && other.isWearable() && !other.isBroken())
+                    other.addWear(cascade * (other.reinforced ? .5f : 1f));
+            }
+    }
+
+    /** Chance per update that a running part starts to fail. */
+    private void rollSuddenFailure(Level level, float speed, float misuse) {
+        if (!WearConfig.SUDDEN_FAILURES.get() || isBroken() || failing > 0 || speed <= 0)
+            return;
+        float reference = WearConfig.f(WearConfig.REFERENCE_SPEED);
+        double hazard = INTERVAL / (WearConfig.FAILURE_HOURS.get() * 72_000.0)
+            * (1 + 20 * wear * wear)
+            * Math.pow(speed / reference, 0.75)
+            * misuse
+            * (reinforced ? WearConfig.f(WearConfig.REINFORCED_FACTOR) : 1f);
+        if (level.random.nextDouble() < hazard)
+            startFailure();
     }
 
     private void onStageChanged(WearStage before, WearStage after) {
@@ -258,6 +340,8 @@ public class WearBehaviour extends BlockEntityBehaviour {
             return;
         if (level.isClientSide) {
             clientTicked = true;
+            if (failing > 0)
+                failing--; // count down locally between updates
             if (hasData())
                 WearEffects.clientTick(this);
             return;
@@ -267,6 +351,7 @@ public class WearBehaviour extends BlockEntityBehaviour {
             WearNetworks.disconnect(kinetic);
         }
         trackShocks(level);
+        tickFailure(level);
     }
 
     @Override
@@ -286,6 +371,7 @@ public class WearBehaviour extends BlockEntityBehaviour {
     private void accumulate(Level level, WearProfile profile) {
         int newCauses = 0;
         float rate = 0;
+        float misuse = 1;
         float speed = Math.abs(kinetic.getSpeed());
 
         if (!isBroken() && speed > 0) {
@@ -318,6 +404,7 @@ public class WearBehaviour extends BlockEntityBehaviour {
 
             float base = 1f / (profile.lifetime() * TICKS_PER_MINUTE * quality(level));
             rate = base * (float) Math.pow(speed / reference, 0.75) * multiplier;
+            misuse = multiplier;
         }
 
         if (!isBroken() && profile.failure() == FailureMode.SMOOTH && WearConfig.CRUSHING_SLIP.get()) {
@@ -342,6 +429,7 @@ public class WearBehaviour extends BlockEntityBehaviour {
             addWear(rate * INTERVAL);
         else
             sync(false);
+        rollSuddenFailure(level, speed, misuse);
     }
 
     /** Random manufacturing quality, rolled once per part. Scales its lifetime. */
@@ -466,6 +554,8 @@ public class WearBehaviour extends BlockEntityBehaviour {
         tag.putFloat("Wear", wear);
         if (reinforced)
             tag.putBoolean("Reinforced", true);
+        if (failing > 0)
+            tag.putInt("Failing", failing);
         if (clientPacket) {
             tag.putInt("Causes", causes);
             tag.putFloat("Rate", wearPerMinute);
@@ -478,6 +568,7 @@ public class WearBehaviour extends BlockEntityBehaviour {
     @Override
     public void read(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket) {
         if (!nbt.contains("CreateWear")) {
+            failing = 0;
             if (clientPacket)
                 applyClient(0, false);
             return;
@@ -485,6 +576,7 @@ public class WearBehaviour extends BlockEntityBehaviour {
         CompoundTag tag = nbt.getCompound("CreateWear");
         float newWear = Mth.clamp(tag.getFloat("Wear"), 0f, 1f);
         boolean newReinforced = tag.getBoolean("Reinforced");
+        failing = tag.getInt("Failing");
         if (clientPacket) {
             causes = tag.getInt("Causes");
             wearPerMinute = tag.getFloat("Rate");

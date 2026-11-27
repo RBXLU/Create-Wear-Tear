@@ -162,7 +162,20 @@ def coat(rng):
     return finish(s, 0.7)
 
 
+def creak(rng):
+    """Stick-slip creaking of a part under strain, with a loose rattle."""
+    t = t_axis(1.1)
+    pitch = rng.uniform(70, 95) * (1 + 0.35 * np.sin(2 * np.pi * rng.uniform(1.5, 2.5) * t)) * (1 + 0.08 * rng.standard_normal(len(t)).cumsum() / 400)
+    saw = (np.cumsum(pitch) / RATE) % 1.0 - 0.5
+    grip = (np.sin(2 * np.pi * rng.uniform(5, 8) * t) > -0.2).astype(float)
+    s = band(saw * grip, 250, 3200) * env(t, 0.08, 0.6)
+    s += crackles(t, 0.05, 0.9, 10, rng, 0.25)
+    s += sum(modes(t, [rng.uniform(900, 1400)], [0.04], [0.25], rng, rng.uniform(0.1, 0.9)) for _ in range(5))
+    return finish(s, 0.75)
+
+
 SOUNDS = {
+    "part.creak": (creak, "creak", 3),
     # event: (generator, file stem, variants)
     "tooth.snap": (tooth_snap, "tooth_snap", 3),
     "tooth.land": (tooth_land, "tooth_land", 3),

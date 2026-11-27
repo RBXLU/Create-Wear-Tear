@@ -28,6 +28,11 @@ When a gear wears past a stage, its teeth break off one by one. **Each tooth fli
 - **Corrosion:** waterlogged parts rust faster.
 - **Slipping crushing wheels:** run a pair at 20 and 50 RPM and their plates grind perfectly round in minutes. A smooth wheel still spins but crushes nothing.
 
+## ⚡ Sudden failures
+Parts don't always wait until they are worn out. **Any running part can suddenly give way.** A new one rarely does, but a badly worn, overspeeding or overloaded part is far more likely to. Hardened parts fail three times less often, and parts that are not turning never do.
+
+You get a warning: the part **creaks, sparks and smokes for a few seconds**, and your goggles show a countdown. **Stop the network in time and the part survives** with a little extra wear. Miss it, and the part breaks with a bang that jolts every part coupled to it.
+
 ## 🔧 How parts fail
 - **Gears and chain drives** strip their teeth. They keep turning with their own shaft but no longer drive anything meshed with them.
 - **Shafts, gearboxes and machines** seize and stop passing rotation on.
@@ -49,12 +54,12 @@ Look at any part through goggles to see its **condition, what is wearing it down
 Hardened parts wear about **three times slower**, shrug off half of every jolt and carry small golden traces of the coating. For automation, a **Spout** coats brand-new part items with 250 mB each.
 
 ## 🛠️ For pack makers
-- Server config for every rate, penalty and failure behaviour.
+- Server config for every rate, penalty and failure behaviour, including how often sudden failures happen and how long the warning lasts.
 - Which blocks wear is a **data map** (`create_wear:wear_profiles`), so datapacks can tune lifetimes or add parts from other addons:
   ```json
   { "values": { "create:cogwheel": { "lifetime": 150, "rated_speed": 128, "failure": "teeth" } } }
   ```
-- `/createwear get|set|repair|reinforce <pos>` for admins and map makers.
+- `/createwear get|set|repair|reinforce|fail <pos>` for admins and map makers.
 - English and Russian translations.
 
 ## ❓ FAQ

@@ -88,5 +88,15 @@
   "create_wear.subtitle.part.break_stone": "Crushing wheel grinds smooth",
   "create_wear.subtitle.part.jolt": "Machinery jolts",
   "create_wear.subtitle.part.grind": "Worn part grinds",
-  "create_wear.subtitle.part.coat": "Hardening compound poured"
+  "create_wear.subtitle.part.coat": "Hardening compound poured",
+  "create_wear.goggles.failing": "About to fail! %1$s s",
+  "create_wear.hover.title.failing": "Part Failing",
+  "create_wear.hover.hint.failing": "Something inside is about to give. _Stop_ the network in the next few seconds to _save_ the part.",
+  "create_wear.command.fail": "Part is failing",
+  "create_wear.subtitle.part.creak": "Part creaks under strain",
+  "create_wear.configuration.sudden": "Sudden failures",
+  "create_wear.configuration.hoursBetweenFailures": "Hours between failures (new part)",
+  "create_wear.configuration.warningSeconds": "Warning time (seconds)",
+  "create_wear.configuration.avertedWear": "Wear from an averted failure",
+  "create_wear.configuration.cascadeWear": "Wear dealt to neighbours"
 }

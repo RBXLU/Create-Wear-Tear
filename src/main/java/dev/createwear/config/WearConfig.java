@@ -29,6 +29,12 @@ public final class WearConfig {
     public static final BooleanValue CRUSHING_SLIP;
     public static final DoubleValue CRUSHING_SLIP_MINUTES;
 
+    public static final BooleanValue SUDDEN_FAILURES;
+    public static final DoubleValue FAILURE_HOURS;
+    public static final IntValue WARNING_SECONDS;
+    public static final DoubleValue AVERTED_WEAR;
+    public static final DoubleValue CASCADE_WEAR;
+
     public static final BooleanValue SHATTER_BROKEN;
     public static final BooleanValue BROKEN_DROPS_SCRAP;
 
@@ -81,6 +87,20 @@ public final class WearConfig {
             .define("slipEnabled", true);
         CRUSHING_SLIP_MINUTES = b.comment("Minutes until a wheel pair with a 2:1 speed mismatch is ground perfectly round.")
             .defineInRange("slipMinutes", 3.0, 0.1, 1000.0);
+        b.pop();
+
+        b.push("sudden");
+        SUDDEN_FAILURES = b.comment("Parts can fail without warning from wear alone. Worn, overspeeding and overloaded parts are far more likely to.")
+            .define("enabled", true);
+        FAILURE_HOURS = b.comment("Average hours of running between sudden failures for a brand new part at the reference speed.",
+                "A badly worn part fails about 15 times as often, a hardened one about 3 times less.")
+            .defineInRange("hoursBetweenFailures", 100.0, 0.05, 100000.0);
+        WARNING_SECONDS = b.comment("Seconds a failing part creaks and sparks before it breaks. Stopping its network in time saves it. 0 = no warning.")
+            .defineInRange("warningSeconds", 6, 0, 120);
+        AVERTED_WEAR = b.comment("Wear a part takes when a failure is averted by stopping the network.")
+            .defineInRange("avertedWear", 0.05, 0.0, 1.0);
+        CASCADE_WEAR = b.comment("Wear dealt to each connected neighbour when a part breaks suddenly.")
+            .defineInRange("cascadeWear", 0.03, 0.0, 1.0);
         b.pop();
 
         b.push("failure");

@@ -47,6 +47,35 @@ public final class WearEffects {
             4 + Mth.ceil(damage * 150), .35, .35, .35, .25);
     }
 
+    /** A failing part strains: a creak and a wisp of smoke. */
+    public static void strainEffects(Level level, KineticBlockEntity be) {
+        if (!(level instanceof ServerLevel server))
+            return;
+        BlockPos pos = be.getBlockPos();
+        server.playSound(null, pos, ModSounds.CREAK.get(), SoundSource.BLOCKS, .9f, .85f + level.random.nextFloat() * .3f);
+        server.sendParticles(ParticleTypes.SMOKE, pos.getX() + .5, pos.getY() + .7, pos.getZ() + .5, 3, .25, .15, .25, .01);
+    }
+
+    /** The network was stopped in time: a hiss of smoke and the part settles. */
+    public static void avertEffects(Level level, KineticBlockEntity be) {
+        if (!(level instanceof ServerLevel server))
+            return;
+        BlockPos pos = be.getBlockPos();
+        server.playSound(null, pos, ModSounds.JOLT.get(), SoundSource.BLOCKS, .5f, .7f);
+        server.sendParticles(ParticleTypes.CLOUD, pos.getX() + .5, pos.getY() + .6, pos.getZ() + .5, 6, .3, .2, .3, .02);
+    }
+
+    /** A sudden break is louder and more violent than a part simply wearing out. */
+    public static void suddenBreakEffects(Level level, KineticBlockEntity be) {
+        if (!(level instanceof ServerLevel server))
+            return;
+        BlockPos pos = be.getBlockPos();
+        double x = pos.getX() + .5, y = pos.getY() + .5, z = pos.getZ() + .5;
+        server.playSound(null, pos, ModSounds.JOLT.get(), SoundSource.BLOCKS, 1f, .8f);
+        server.sendParticles(ParticleTypes.EXPLOSION, x, y, z, 1, 0, 0, 0, 0);
+        server.sendParticles(ParticleTypes.LAVA, x, y, z, 4, .3, .3, .3, 0);
+    }
+
     /** Debris and grinding noise from worn parts that are still spinning. */
     public static void clientTick(WearBehaviour wear) {
         Level level = wear.getWorld();
@@ -54,13 +83,25 @@ public final class WearEffects {
         if (FMLEnvironment.dist.isClient())
             ClientWearHooks.track(wear);
 
+        RandomSource random = level.random;
+        BlockPos pos = be.getBlockPos();
+        if (wear.isFailing() && WearConfig.PARTICLES.get()) {
+            // sparks fly off a part that is about to give
+            if (random.nextFloat() < .6f) {
+                double x = pos.getX() + .5 + (random.nextDouble() - .5) * 1.2;
+                double y = pos.getY() + .5 + (random.nextDouble() - .5) * 1.2;
+                double z = pos.getZ() + .5 + (random.nextDouble() - .5) * 1.2;
+                level.addParticle(ParticleTypes.CRIT, x, y, z, (random.nextDouble() - .5) * .4, random.nextDouble() * .3, (random.nextDouble() - .5) * .4);
+            }
+            if (random.nextFloat() < .08f)
+                level.addParticle(ParticleTypes.SMOKE, pos.getX() + .5, pos.getY() + .9, pos.getZ() + .5, 0, .03, 0);
+        }
+
         WearStage stage = wear.stage();
         float speed = Math.abs(be.getSpeed());
         if (speed == 0 || stage.ordinal() < WearStage.WORN.ordinal())
             return;
 
-        RandomSource random = level.random;
-        BlockPos pos = be.getBlockPos();
         BlockState state = be.getBlockState();
         boolean broken = stage == WearStage.BROKEN;
 

@@ -64,6 +64,14 @@ public final class DevSceneClient {
         new Shot("goggles_worn", 4.5, -58.9, 3.3, 180, 18, true, DevSceneClient::goggles),
         new Shot("goggles_broken", 6.5, -58.9, 3.3, 180, 18, true, DevSceneClient::goggles),
         new Shot("goggles_slip", 15.6, -58.0, 15.5, 90, 13, true, DevSceneClient::goggles),
+        new Shot("goggles_failing", 4.5, -58.9, 3.3, 180, 18, true, mc -> {
+            goggles(mc);
+            onServer(mc, (level, player) -> {
+                var wear = dev.createwear.wear.WearBehaviour.get(level.getBlockEntity(new net.minecraft.core.BlockPos(4, DevScene.Y, 1)));
+                if (wear != null)
+                    wear.startFailure();
+            });
+        }, 50),
         new Shot("fluid", 16.5, -59.0, 5.2, 180, 30, false, mc -> {}),
         new Shot("teeth_snap", 2.5, -58.6, 3.6, 180, 20, false, mc -> setWear(mc, new net.minecraft.core.BlockPos(2, DevScene.Y, 1), .7f), 7),
         new Shot("teeth_large", 3.5, -57.4, 8.6, 180, 22, false, mc -> setWear(mc, new net.minecraft.core.BlockPos(3, DevScene.Y + 1, 5), 1f), 9),

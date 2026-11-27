@@ -88,5 +88,15 @@
   "create_wear.subtitle.part.break_stone": "Дробильное колесо стирается",
   "create_wear.subtitle.part.jolt": "Механизм дёргается",
   "create_wear.subtitle.part.grind": "Скрежет изношенной детали",
-  "create_wear.subtitle.part.coat": "Льётся закалочный состав"
+  "create_wear.subtitle.part.coat": "Льётся закалочный состав",
+  "create_wear.goggles.failing": "Вот-вот сломается! %1$s с",
+  "create_wear.hover.title.failing": "Деталь на грани поломки",
+  "create_wear.hover.hint.failing": "Внутри что-то вот-вот лопнет. _Остановите_ сеть в ближайшие секунды, чтобы _спасти_ деталь.",
+  "create_wear.command.fail": "Деталь начала ломаться",
+  "create_wear.subtitle.part.creak": "Деталь трещит под нагрузкой",
+  "create_wear.configuration.sudden": "Внезапные поломки",
+  "create_wear.configuration.hoursBetweenFailures": "Часов между поломками (новая деталь)",
+  "create_wear.configuration.warningSeconds": "Время предупреждения (секунды)",
+  "create_wear.configuration.avertedWear": "Износ от предотвращённой поломки",
+  "create_wear.configuration.cascadeWear": "Износ соседних деталей"
 }

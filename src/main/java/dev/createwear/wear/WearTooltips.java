@@ -48,6 +48,14 @@ public final class WearTooltips {
             return true;
         }
 
+        if (wear.isFailing()) {
+            // the hover text below explains what to do; here only the countdown
+            WearLang.builder().text(ChatFormatting.RED, "\u26A0 ")
+                .add(WearLang.translate("goggles.failing", Math.max(1, (wear.failing() + 19) / 20)).style(ChatFormatting.RED))
+                .forGoggles(tooltip, 1);
+            return true;
+        }
+
         int causes = wear.causes();
         if (causes != 0) {
             WearLang.translate("goggles.causes").style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
@@ -76,7 +84,16 @@ public final class WearTooltips {
 
     public static boolean addBrokenWarning(KineticBlockEntity be, List<Component> tooltip) {
         WearBehaviour wear = WearBehaviour.get(be);
-        if (wear == null || !wear.isBroken())
+        if (wear == null)
+            return false;
+        if (wear.isFailing()) {
+            WearLang.translate("hover.title.failing").style(ChatFormatting.RED).forGoggles(tooltip);
+            Component hint = WearLang.translate("hover.hint.failing").component();
+            for (Component line : FontHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE))
+                WearLang.builder().add(line.copy()).forGoggles(tooltip);
+            return true;
+        }
+        if (!wear.isBroken())
             return false;
         WearProfile profile = wear.profile();
         if (profile == null)

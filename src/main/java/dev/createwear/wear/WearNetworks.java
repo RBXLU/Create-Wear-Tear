@@ -48,6 +48,21 @@ public final class WearNetworks {
             && defTo.hasShaftTowards(level, to.getBlockPos(), stateTo, direction.getOpposite());
     }
 
+    /** Kinetic blocks next to this one that it is actually coupled to. */
+    public static java.util.List<KineticBlockEntity> connectedNeighbours(KineticBlockEntity be) {
+        java.util.List<KineticBlockEntity> out = new java.util.ArrayList<>();
+        Level level = be.getLevel();
+        if (level == null)
+            return out;
+        for (Direction side : Direction.values()) {
+            BlockPos pos = be.getBlockPos().relative(side);
+            if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof KineticBlockEntity other
+                && (RotationPropagator.isConnected(be, other) || RotationPropagator.isConnected(other, be)))
+                out.add(other);
+        }
+        return out;
+    }
+
     /** Re-runs propagation around a part that just broke, so the severed side spins down. */
     public static void disconnect(KineticBlockEntity be) {
         Level level = be.getLevel();

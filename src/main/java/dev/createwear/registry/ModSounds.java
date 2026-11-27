@@ -15,6 +15,8 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BREAK_METAL = register("part.break_metal");
     /** A crushing wheel ground smooth: a long stony scrape. */
     public static final DeferredHolder<SoundEvent, SoundEvent> BREAK_STONE = register("part.break_stone");
+    /** A part about to fail: creaking and rattling under strain. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> CREAK = register("part.creak");
     /** Reversal or speed jump under load. */
     public static final DeferredHolder<SoundEvent, SoundEvent> JOLT = register("part.jolt");
     /** A single gear tooth snapping off. */
