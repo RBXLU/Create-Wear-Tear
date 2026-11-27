@@ -147,9 +147,9 @@ python3 tools/generate_sounds.py
 Синтезирует звуки (нужен ffmpeg с libvorbis).
 
 ```bash
-python3 tools/compose_icon.py run/scene/screenshots/icon_309.png docs/icon.png
+python3 tools/compose_badge.py run/scene/screenshots/badge_305.png docs/icon.png
 ```
-Собирает иконку проекта из кадра, снятого `./gradlew runIconClient` (шестерня на зелёном фоне): вырезает фон, добавляет подложку, тень и контур. `tools/make_icon.py` рисует пиксельную иконку, которая идёт в jar как логотип мода.
+Собирает иконку-значок в стиле аддонов Create (синий круг, белое кольцо) из кадра, снятого `./gradlew runIconClient -PiconStyle=badge`. `tools/make_icon.py` рисует пиксельную иконку, которая идёт в jar как логотип мода.
 
 ```bash
 python3 tools/generate_data.py

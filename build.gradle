@@ -61,6 +61,7 @@ neoForge {
             gameDirectory = project.file("run/scene")
             systemProperty "createwear.devScene", "true"
             systemProperty "createwear.devScene.icon", "true"
+            systemProperty "createwear.devScene.iconStyle", (project.findProperty("iconStyle") ?: "plain").toString()
             programArguments.addAll("--width", "1024", "--height", "1024")
         }
         gameTestServer {
