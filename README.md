@@ -147,9 +147,9 @@ python3 tools/generate_sounds.py
 Синтезирует звуки (нужен ffmpeg с libvorbis).
 
 ```bash
-python3 tools/compose_badge.py run/scene/screenshots/badge_305.png docs/icon.png
+python3 tools/draw_icon.py docs/icon.png
 ```
-Собирает иконку-значок в стиле аддонов Create (синий круг, белое кольцо) из кадра, снятого `./gradlew runIconClient -PiconStyle=badge`. `tools/make_icon.py` рисует пиксельную иконку, которая идёт в jar как логотип мода.
+Рисует иконку проекта в стиле Create: шестерня с отломанными зубьями и трещинами в плоской заливке, белый контур-наклейка и синий круг с сеткой. Всё рисуется кодом, без картинок из игры. `tools/make_icon.py` рисует пиксельную иконку, которая идёт в jar как логотип мода.
 
 ```bash
 python3 tools/generate_data.py
